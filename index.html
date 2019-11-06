@@ -1,0 +1,144 @@
+<html>
+    <head>
+        <script src="https://www.gstatic.com/firebasejs/5.7.3/firebase.js"></script>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+    </head>
+
+
+  <body>
+
+    <h1><center><font face="geneva"size="7">Push... Or Whatever</font></center></h1>
+    <ul>
+        <h1 id="uid"><font face="geneva">user: </font></h1>
+        <button class="button" style="vertical-align:middle" onclick="signin()"><span>Sign in</span></button>
+        <button class="button" style="vertical-align:middle" onclick="getData()"><span>Get data</span></button>
+        <button class="button" style="vertical-align:middle" onclick="setData()"><span>Set data</span></button>
+        <button class="button" style="vertical-align:middle" onclick="updateData()"><span>Update data</span></button>
+        <button class="button" style="vertical-align:middle" onclick="pushData()"><span>Push data</span></button>
+        <button class="button" style="vertical-align:middle" onclick="removeData()"><span>Remove data</span></button>
+        <div id="info"></div>
+</body>
+    
+
+
+
+<style>
+body{
+    background-color: #72E8FF;
+}
+
+
+.button {
+  display: inline-block;
+  border-radius: 20px;
+  background-color: blue;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 13px;
+  padding: 7px;
+  width: 120px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+</style>
+
+
+
+
+<script>
+
+        var config = {
+            apiKey: "AIzaSyAKo1ZcKVKFnt9u8yOx0uWhY9m8JgrSUz4",
+            authDomain: "basic-c4ea9.firebaseapp.com",
+            databaseURL: "https://basic-c4ea9.firebaseio.com",
+            projectId: "basic-c4ea9",
+            storageBucket: "basic-c4ea9.appspot.com",
+            messagingSenderId: "642513213120",
+            appId: "1:642513213120:web:f1fabe7c07717513517f25",
+            measurementId: "G-X66C54BK7V"
+          };
+        firebase.initializeApp(config);
+               
+        // Check to see if you are logged in
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user == null) {
+                document.getElementById("uid").innerHTML = "not logged in";
+                return;
+            } else {
+                userId = user.displayName; // you can also get .displayName, .photoURL, .email
+                document.getElementById("uid").innerHTML = "user: " + userId; // display Google uid on page
+                
+            } // end user null check
+        }); // end check auth state
+        
+       // HERE IS THE FUNCTION TO SHOW HOW TO GET USER DATA
+       function getData() {
+           var userId = document.getElementById("uid").innerHTML;
+           firebase.database().ref('/tweets/' + userId).once('value', function(snapshot) {
+               console.log(snapshot.val());
+           });
+
+       }
+       
+       // HERE IS THE FUNCTION TO SHOW HOW TO SET/OVERWRITE USER DATA
+       function setData() {
+           var userId = document.getElementById("uid").innerHTML;
+           var js_time = Date.now();
+           firebase.database().ref('/tweets/' + userId).set({tweet:"Set over-writes", time: js_time}); 
+       }
+        
+       // HERE IS THE FUNCTION TO SHOW HOW TO SET/OVERWRITE USER DATA
+       function updateData() {
+           var userId = document.getElementById("uid").innerHTML;
+           firebase.database().ref('/tweets/' + userId).update({tweet:"Update replaces data, but will leave non replaced data as is"}); 
+       }
+         
+        // HERE IS THE FUNCTION TO SHOW HOW TO PUSH/ADD NEW USER DATA TO EXISTING DATABASE
+        function pushData() {
+            var userId = document.getElementById("uid").innerHTML;
+            var js_time = Date.now();
+            var tweetid = firebase.database().ref('tweets/' + userId + "/").push({tweet: "push adds to the nodes, a unique key/timestamp is also added", time: js_time});
+        }
+
+        // HERE IS THE FUNCTION TO SHOW HOW TO REMOVE USER DATA FROM EXISTING DATABASE - BE CAREFUL!
+        function removeData() {
+            var tweetid = firebase.database().ref('tweets/' + userId + "/").remove();
+        }
+        
+        function signin() {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithRedirect(provider).then(function(result) { 
+                window.location.replace("fbtest.html");
+            });
+        }
+    </script>
+</html>
